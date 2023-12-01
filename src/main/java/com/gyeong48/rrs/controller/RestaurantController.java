@@ -33,6 +33,7 @@ public class RestaurantController {
 
     @PutMapping("/restaurants/{restaurantId}")
     public String editRestaurant(@PathVariable Long restaurantId, @RequestBody CreateAndEditRestaurantRequest request) {
+        restaurantService.edit(restaurantId, request);
         return "This is editRestaurant API and PathVariable is " + restaurantId
                 + " restaurant name=" + request.getName()
                 + " restaurant address=" + request.getAddress()
@@ -42,6 +43,7 @@ public class RestaurantController {
 
     @DeleteMapping("/restaurants/{restaurantId}")
     public String deleteRestaurant(@PathVariable Long restaurantId) {
+        restaurantService.delete(restaurantId);
         return "This is deleteRestaurant API and PathVariable is " + restaurantId;
     }
 }

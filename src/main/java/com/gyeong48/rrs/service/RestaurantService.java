@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +42,39 @@ public class RestaurantService {
                     menuRepository.save(menu);
                 }
         );
+    }
+
+    @Transactional
+    public void edit(Long restaurantId, CreateAndEditRestaurantRequest request) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow();
+        List<Menu> menus = menuRepository.findByRestaurant_Id(restaurantId);
+
+        restaurant.changeNameAndAddress(request.getName(), request.getAddress());
+        request.getMenus().forEach(requestMenu -> {
+            Menu foundMenu = menus.stream()
+                    .filter(menu -> requestMenu.getName().equals(menu.getName()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (foundMenu != null) {
+                foundMenu.changeNameAndPrice(requestMenu.getName(), requestMenu.getPrice());
+            } else {
+                Menu newMenu = Menu.builder()
+                        .name(requestMenu.getName())
+                        .price(requestMenu.getPrice())
+                        .createdAt(ZonedDateTime.now())
+                        .updatedAt(ZonedDateTime.now())
+                        .restaurant(restaurant)
+                        .build();
+                menuRepository.save(newMenu);
+            }
+        });
+    }
+
+    @Transactional
+    public void delete(Long restaurantId) {
+        restaurantRepository.deleteById(restaurantId);
+        menuRepository.deleteByRestaurant_Id(restaurantId);
     }
 }

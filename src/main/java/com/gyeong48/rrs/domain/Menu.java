@@ -26,4 +26,10 @@ public class Menu {
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    public void changeNameAndPrice(String name, int price) {
+        this.name = name;
+        this.price = price;
+        this.updatedAt = ZonedDateTime.now();
+    }
 }

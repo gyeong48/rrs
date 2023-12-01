@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class CreateAndEditRestaurantRequestMenu {
     private String name;
-    private String price;
+    private Integer price;
 }

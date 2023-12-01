@@ -1,10 +1,15 @@
 package com.gyeong48.rrs.controller;
 
 import com.gyeong48.rrs.request.CreateAndEditRestaurantRequest;
+import com.gyeong48.rrs.service.RestaurantService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class RestaurantController {
+
+    private final RestaurantService restaurantService;
 
     @GetMapping("/restaurants")
     public String getRestaurants() {
@@ -18,6 +23,7 @@ public class RestaurantController {
 
     @PostMapping("/restaurants")
     public String createRestaurant(@RequestBody CreateAndEditRestaurantRequest request) {
+        restaurantService.create(request);
         return "This is createRestaurants API"
                 + " restaurant name=" + request.getName()
                 + " restaurant address=" + request.getAddress()

@@ -35,6 +35,8 @@ public class ReviewService {
 
     @Transactional
     public void delete(Long reviewId) {
-        reviewRepository.deleteById(reviewId);
+        //피드백 -> 유효성 검사를 명시해주는 것이 좋은 것 같다.
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException("존재 하지 않는 리뷰입니다."));
+        reviewRepository.delete(review);
     }
 }

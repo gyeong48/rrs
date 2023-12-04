@@ -1,6 +1,7 @@
 package com.gyeong48.rrs.controller;
 
 import com.gyeong48.rrs.request.CreateReviewRequest;
+import com.gyeong48.rrs.response.RestaurantReviewResponse;
 import com.gyeong48.rrs.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,5 +20,10 @@ public class ReviewController {
     @DeleteMapping("/review/{reviewId}")
     public void deleteReview(@PathVariable Long reviewId) {
         reviewService.delete(reviewId);
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/review")
+    public RestaurantReviewResponse getReviews(@PathVariable Long restaurantId) {
+        return reviewService.getList(restaurantId);
     }
 }

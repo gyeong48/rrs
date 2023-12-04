@@ -1,9 +1,12 @@
 package com.gyeong48.rrs.controller;
 
+import com.gyeong48.rrs.domain.Restaurant;
 import com.gyeong48.rrs.request.CreateAndEditRestaurantRequest;
 import com.gyeong48.rrs.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -12,8 +15,8 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping("/restaurants")
-    public String getRestaurants() {
-        return "This is getRestaurants API";
+    public List<Restaurant> getRestaurants() {
+        return restaurantService.getList();
     }
 
     @GetMapping("/restaurants/{restaurantId}")

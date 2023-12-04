@@ -5,7 +5,6 @@ import com.gyeong48.rrs.response.RestaurantReviewResponse;
 import com.gyeong48.rrs.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -5,8 +5,9 @@ import com.gyeong48.rrs.domain.Restaurant;
 import com.gyeong48.rrs.repository.MenuRepository;
 import com.gyeong48.rrs.repository.RestaurantRepository;
 import com.gyeong48.rrs.request.CreateAndEditRestaurantRequest;
-import com.gyeong48.rrs.response.GetRestaurantResponse;
-import com.gyeong48.rrs.response.GetRestaurantResponseMenu;
+import com.gyeong48.rrs.response.RestaurantDetailResponse;
+import com.gyeong48.rrs.response.RestaurantResponse;
+import com.gyeong48.rrs.response.RestaurantDetailResponseMenu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,17 +22,45 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
 
-    public List<Restaurant> getList() {
-        return restaurantRepository.findAll();
+    //피드백 -> 맛집 정보 및 리스트 가져오기
+    //      -> builder 패턴으로 수정 및 클래스명 수정
+    public List<RestaurantResponse> getList() {
+        return restaurantRepository
+                .findAll()
+                .stream()
+                .map(restaurant -> RestaurantResponse.builder()
+                        .id(restaurant.getId())
+                        .name(restaurant.getName())
+                        .address(restaurant.getAddress())
+                        .createdAt(restaurant.getCreatedAt())
+                        .updatedAt(restaurant.getUpdatedAt())
+                        .build()
+                )
+                .toList();
     }
 
-    public GetRestaurantResponse get(Long restaurantId) {
+    public RestaurantDetailResponse get(Long restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(() -> new RuntimeException("없는 맛집 입니다."));
-        List<GetRestaurantResponseMenu> menus = menuRepository.findAllByRestaurantId(restaurantId)
+        List<RestaurantDetailResponseMenu> menus = menuRepository.findAllByRestaurantId(restaurantId)
                 .stream()
-                .map(menu -> new GetRestaurantResponseMenu(menu.getId(), menu.getName(), menu.getPrice(), menu.getCreatedAt(), menu.getUpdatedAt()))
+                .map(menu -> RestaurantDetailResponseMenu.builder()
+                        .id(menu.getId())
+                        .name(menu.getName())
+                        .price(menu.getPrice())
+                        .createdAt(menu.getCreatedAt())
+                        .updatedAt(menu.getUpdatedAt())
+                        .build()
+                )
                 .toList();
-        return new GetRestaurantResponse(restaurant.getId(), restaurant.getName(), restaurant.getAddress(), restaurant.getCreatedAt(), restaurant.getUpdatedAt(), menus);
+
+        return RestaurantDetailResponse.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .address(restaurant.getAddress())
+                .createdAt(restaurant.getCreatedAt())
+                .updatedAt(restaurant.getUpdatedAt())
+                .menus(menus)
+                .build();
     }
 
     @Transactional

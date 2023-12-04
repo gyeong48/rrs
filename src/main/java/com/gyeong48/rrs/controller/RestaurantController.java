@@ -2,6 +2,7 @@ package com.gyeong48.rrs.controller;
 
 import com.gyeong48.rrs.domain.Restaurant;
 import com.gyeong48.rrs.request.CreateAndEditRestaurantRequest;
+import com.gyeong48.rrs.response.GetRestaurantResponse;
 import com.gyeong48.rrs.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,8 @@ public class RestaurantController {
     }
 
     @GetMapping("/restaurants/{restaurantId}")
-    public String getRestaurant(@PathVariable Long restaurantId) {
-        return "This is getRestaurant API and PathVariable is " + restaurantId;
+    public GetRestaurantResponse getRestaurant(@PathVariable Long restaurantId) {
+        return restaurantService.get(restaurantId);
     }
 
     @PostMapping("/restaurants")

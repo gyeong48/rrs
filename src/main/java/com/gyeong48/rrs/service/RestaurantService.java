@@ -5,6 +5,8 @@ import com.gyeong48.rrs.domain.Restaurant;
 import com.gyeong48.rrs.repository.MenuRepository;
 import com.gyeong48.rrs.repository.RestaurantRepository;
 import com.gyeong48.rrs.request.CreateAndEditRestaurantRequest;
+import com.gyeong48.rrs.response.GetRestaurantResponse;
+import com.gyeong48.rrs.response.GetRestaurantResponseMenu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,15 @@ public class RestaurantService {
 
     public List<Restaurant> getList() {
         return restaurantRepository.findAll();
+    }
+
+    public GetRestaurantResponse get(Long restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId).orElseThrow(() -> new RuntimeException("없는 맛집 입니다."));
+        List<GetRestaurantResponseMenu> menus = menuRepository.findAllByRestaurantId(restaurantId)
+                .stream()
+                .map(menu -> new GetRestaurantResponseMenu(menu.getId(), menu.getName(), menu.getPrice(), menu.getCreatedAt(), menu.getUpdatedAt()))
+                .toList();
+        return new GetRestaurantResponse(restaurant.getId(), restaurant.getName(), restaurant.getAddress(), restaurant.getCreatedAt(), restaurant.getUpdatedAt(), menus);
     }
 
     @Transactional

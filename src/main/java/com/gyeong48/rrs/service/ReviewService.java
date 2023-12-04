@@ -7,11 +7,12 @@ import com.gyeong48.rrs.repository.ReviewRepository;
 import com.gyeong48.rrs.request.CreateReviewRequest;
 import com.gyeong48.rrs.response.RestaurantReviewResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -42,24 +43,27 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-    public RestaurantReviewResponse getList(Long restaurantId) {
-        restaurantRepository.findById(restaurantId).orElseThrow(); //유효성 검사
-        List<Review> reviews = reviewRepository.findAllByRestaurantId(restaurantId);
-        double avgScore = 0.0;
-
-        for (Review review : reviews) avgScore += review.getScore();
-        if (!reviews.isEmpty()) avgScore = avgScore / reviews.size();
+    //피드백 -> QueryDSL을 적용한 코드
+    public RestaurantReviewResponse getList(Long restaurantId, Pageable page) {
+        Double avgScore = reviewRepository.getAvgScoreByRestaurantId(restaurantId);
+        Slice<Review> reviews = reviewRepository.findSliceByRestaurantId(restaurantId, page);
 
         return RestaurantReviewResponse.builder()
                 .avgScore(avgScore)
-                .reviews(reviews.stream().map(
-                        review -> RestaurantReviewResponse.Review.builder()
+                .reviews(reviews.getContent().stream()
+                        .map(review -> RestaurantReviewResponse.Review.builder()
                                 .id(review.getId())
                                 .content(review.getContent())
                                 .score(review.getScore())
                                 .createdAt(review.getCreatedAt())
                                 .build()
-                ).toList())
+                        ).toList()
+                )
+                .page(RestaurantReviewResponse.RestaurantReviewResponsePage.builder()
+                        .offset(page.getPageNumber() * page.getPageSize())
+                        .limit(page.getPageSize())
+                        .build()
+                )
                 .build();
     }
 }
